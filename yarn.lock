@@ -1456,9 +1456,9 @@
   dependencies:
     events "^2.0.0"
 
-"@ledgerhq/live-common@^2.2.0-beta.10":
-  version "2.2.0-beta.10"
-  resolved "https://registry.yarnpkg.com/@ledgerhq/live-common/-/live-common-2.2.0-beta.10.tgz#9dbeee35ea65dfbd041f13b622f57ec9de668d88"
+"@ledgerhq/live-common@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@ledgerhq/live-common/-/live-common-2.3.0.tgz#96603a95c57ea5dfe48b0dedff39ed9575a6c470"
   dependencies:
     axios "^0.18.0"
     invariant "^2.2.2"
