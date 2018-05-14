@@ -18,7 +18,7 @@ import SelectAccount from 'components/SelectAccount'
 import Spoiler from 'components/base/Spoiler'
 
 type PropsStepAmount = {
-  account: Account | null,
+  account: ?Account,
   onChange: Function,
   recipientAddress: string,
   amount: number,
@@ -39,7 +39,7 @@ function StepAmount(props: PropsStepAmount) {
       </Box>
 
       {account && (
-        <Fragment>
+        <Fragment key={account.id}>
           {/* RECIPIENT ADDRESS */}
           <Box flow={1}>
             <Label>
@@ -57,7 +57,7 @@ function StepAmount(props: PropsStepAmount) {
           <Box flow={1}>
             <Label>{t('send:steps.amount.amount')}</Label>
             <RequestAmount
-              max={account.balance - fees}
+              withMax={false}
               account={account}
               onChange={onChange('amount')}
               value={amount}
@@ -128,7 +128,7 @@ function Fees(props: PropsFees) {
         onChange={() => onChange(amount)}
       />
       <InputCurrency
-        unit={units[0]}
+        defaultUnit={units[0]}
         units={units}
         containerProps={{ grow: true }}
         value={amount}

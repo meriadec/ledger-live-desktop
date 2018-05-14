@@ -32,39 +32,48 @@ const mapStateToProps = createStructuredSelector({
 })
 
 function Footer({ exchange, account, amount, fees, t, onNext, canNext, showTotal }: Props) {
+  const totalSpent = amount + fees
   return (
     <ModalFooter>
       <Box horizontal alignItems="center" justifyContent="flex-end" flow={2}>
-        {showTotal && (
+        {totalSpent > account.balance ? (
           <Box grow>
-            <Label>{t('send:totalSpent')}</Label>
-            <Box horizontal flow={2} align="center">
-              <FormattedVal
-                disableRounding
-                color="dark"
-                val={amount + fees}
-                unit={account.unit}
-                showCode
-              />
-              <Box horizontal align="center">
-                <Text ff="Rubik" fontSize={3}>
-                  {'('}
-                </Text>
-                <CounterValue
-                  exchange={exchange}
-                  currency={account.currency}
-                  value={amount + fees}
+            <Label>
+              <Text color="pearl">{t('send:notEnoughBalance')}</Text>
+            </Label>
+          </Box>
+        ) : (
+          showTotal && (
+            <Box grow>
+              <Label>{t('send:totalSpent')}</Label>
+              <Box horizontal flow={2} align="center">
+                <FormattedVal
                   disableRounding
-                  color="grey"
-                  fontSize={3}
+                  color="dark"
+                  val={totalSpent}
+                  unit={account.unit}
                   showCode
                 />
-                <Text ff="Rubik" fontSize={3}>
-                  {')'}
-                </Text>
+                <Box horizontal align="center">
+                  <Text ff="Rubik" fontSize={3}>
+                    {'('}
+                  </Text>
+                  <CounterValue
+                    exchange={exchange}
+                    currency={account.currency}
+                    value={totalSpent}
+                    disableRounding
+                    color="grey"
+                    fontSize={3}
+                    showCode
+                  />
+                  <Text ff="Rubik" fontSize={3}>
+                    {')'}
+                  </Text>
+                </Box>
               </Box>
             </Box>
-          </Box>
+          )
         )}
         <Button primary onClick={onNext} disabled={!canNext}>
           {'Next'}
