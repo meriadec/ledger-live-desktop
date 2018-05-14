@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import type { Account } from '@ledgerhq/live-common/lib/types'
 import { createStructuredSelector } from 'reselect'
-import { updateAccount } from 'actions/accounts'
+import { updateAccountWithUpdater } from 'actions/accounts'
 import type { State } from 'reducers'
 import { setAccountSyncState, setAccountPullMoreState } from 'actions/bridgeSync'
 import { pullMoreStateSelector, syncStateSelector } from 'reducers/bridgeSync'
@@ -24,9 +24,9 @@ type BridgeSyncProviderProps = {
 type BridgeSyncProviderOwnProps = BridgeSyncProviderProps & {
   state: State,
   accounts: Account[],
-  updateAccount: Account => void,
-  setAccountSyncState: (Account, AsyncState) => *,
-  setAccountPullMoreState: (Account, AsyncState) => *,
+  updateAccountWithUpdater: (string, (Account) => Account) => void,
+  setAccountSyncState: (string, AsyncState) => *,
+  setAccountPullMoreState: (string, AsyncState) => *,
 }
 
 type AsyncState = {
@@ -35,13 +35,13 @@ type AsyncState = {
 }
 
 type BridgeSync = {
-  synchronize: (account: Account) => Promise<void>,
+  synchronize: (accountId: string) => Promise<void>,
 
   // sync for all accounts (if there were errors it stopped)
   syncAll: () => {},
 
   //
-  pullMoreOperations: (account: Account, count: number) => Promise<void>,
+  pullMoreOperations: (accountId: string, count: number) => Promise<void>,
 }
 
 const mapStateToProps = createStructuredSelector({
@@ -50,7 +50,7 @@ const mapStateToProps = createStructuredSelector({
 })
 
 const actions = {
-  updateAccount,
+  updateAccountWithUpdater,
   setAccountSyncState,
   setAccountPullMoreState,
 }
@@ -62,68 +62,74 @@ class Provider extends Component<BridgeSyncProviderOwnProps, BridgeSync> {
     const syncSubs = {}
     const pullMorePromises = {}
 
-    const getSyncState = account => syncStateSelector(this.props.state, { account })
+    const getSyncState = accountId => syncStateSelector(this.props.state, { accountId })
 
-    const getPullMoreOperationsState = account =>
-      pullMoreStateSelector(this.props.state, { account })
+    const getPullMoreOperationsState = accountId =>
+      pullMoreStateSelector(this.props.state, { accountId })
 
-    const pullMoreOperations = (account, count) => {
-      const state = getPullMoreOperationsState(account)
+    const getBridgeForAccountId = accountId => {
+      const a = this.props.accounts.find(a => a.id === accountId)
+      if (!a) throw new Error('account not found')
+      return getBridgeForCurrency(a.currency)
+    }
+
+    const pullMoreOperations = (accountId, count) => {
+      const state = getPullMoreOperationsState(accountId)
       if (state.pending) {
         return (
-          pullMorePromises[account.id] || Promise.reject(new Error('no pullMore started. (bug)'))
+          pullMorePromises[accountId] || Promise.reject(new Error('no pullMore started. (bug)'))
         )
       }
-      this.props.setAccountPullMoreState(account, { pending: true, error: null })
-      const bridge = getBridgeForCurrency(account.currency)
-      const p = bridge.pullMoreOperations(account, count).then(
-        account => {
-          this.props.setAccountPullMoreState(account, {
+      this.props.setAccountPullMoreState(accountId, { pending: true, error: null })
+      const bridge = getBridgeForAccountId(accountId)
+      const p = bridge.pullMoreOperations(accountId, count).then(
+        accountUpdater => {
+          this.props.setAccountPullMoreState(accountId, {
             pending: false,
             error: null,
           })
-          this.props.updateAccount(account)
+          this.props.updateAccountWithUpdater(accountId, accountUpdater)
         },
         error => {
-          this.props.setAccountPullMoreState(account, {
+          this.props.setAccountPullMoreState(accountId, {
             pending: false,
             error,
           })
         },
       )
-      pullMorePromises[account.id] = p
+      pullMorePromises[accountId] = p
       return p
     }
 
-    const synchronize = account => {
-      const state = getSyncState(account)
+    const synchronize = accountId => {
+      const state = getSyncState(accountId)
       if (state.pending) {
-        return syncPromises[account.id] || Promise.reject(new Error('no sync started. (bug)'))
+        return syncPromises[accountId] || Promise.reject(new Error('no sync started. (bug)'))
       }
 
-      this.props.setAccountSyncState(account, { pending: true, error: null })
-      const bridge = getBridgeForCurrency(account.currency)
+      this.props.setAccountSyncState(accountId, { pending: true, error: null })
+      const bridge = getBridgeForAccountId(accountId)
       const p = new Promise((resolve, reject) => {
-        const subscription = bridge.synchronize(account, {
-          next: account => {
-            this.props.updateAccount(account)
+        const subscription = bridge.synchronize(accountId, {
+          next: accountUpdater => {
+            this.props.updateAccountWithUpdater(accountId, accountUpdater)
           },
           complete: () => {
-            this.props.setAccountSyncState(account, { pending: false, error: null })
+            this.props.setAccountSyncState(accountId, { pending: false, error: null })
             resolve()
           },
           error: error => {
-            this.props.setAccountSyncState(account, { pending: false, error })
+            this.props.setAccountSyncState(accountId, { pending: false, error })
             reject(error)
           },
         })
-        syncSubs[account.id] = subscription
+        syncSubs[accountId] = subscription
       })
-      syncPromises[account.id] = p
+      syncPromises[accountId] = p
       return p
     }
 
-    const syncAll = () => Promise.all(this.props.accounts.map(synchronize))
+    const syncAll = () => Promise.all(this.props.accounts.map(account => synchronize(account.id)))
 
     this.api = {
       synchronize,

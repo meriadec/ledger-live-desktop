@@ -16,8 +16,8 @@ const getBridge = (currency: Currency): WalletBridge<*> => {
 
 export type DeviceId = string // for now it's just usb path
 
-export type AccountObserver = {
-  next: Account => void,
+export type Observer<T> = {
+  next: T => void,
   complete: () => void,
   error: (?Error) => void,
 }
@@ -31,22 +31,23 @@ export interface WalletBridge<Transaction> {
   scanAccountsOnDevice(
     currency: Currency,
     deviceId: DeviceId,
-    observer: AccountObserver,
+    observer: Observer<Account>,
   ): Subscription;
 
   // synchronize an account. it ends when it has finish to sync,
-  // if account changes it is emitted in observer.
+  // if there are some account changes, updater function get emitted.
+  // an update function is just a Account => Account that perform the changes. (this is safer for race-conditions)
   // this can emit new version of the account. typically these field can change over time:
   // - operations if there are new ones (prepended)
   // - balance
   // - blockHeight
-  synchronize(account: Account, observer: AccountObserver): Subscription;
+  synchronize(accountId: string, observer: Observer<(Account) => Account>): Subscription;
 
   // for a given account, UI wants to load more operations in the account.operations
   // if you can't do it or there is no more things to load, just return account,
-  // otherwise return account with new operations in account.operations
+  // otherwise return account updater that add operations in account.operations
   // count is the desired number to pull (but implementation can decide)
-  pullMoreOperations(account: Account, count: number): Promise<Account>;
+  pullMoreOperations(accountId: string, count: number): Promise<(Account) => Account>;
 
   // Related to send funds:
 

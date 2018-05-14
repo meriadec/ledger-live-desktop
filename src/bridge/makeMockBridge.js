@@ -5,7 +5,7 @@ import {
   genOperation,
 } from '@ledgerhq/live-common/lib/mock/account'
 import Prando from 'prando'
-import type { Account, Operation } from '@ledgerhq/live-common/lib/types'
+import type { Operation } from '@ledgerhq/live-common/lib/types'
 import type { WalletBridge } from './types'
 
 const defaultOpts = {
@@ -35,32 +35,34 @@ function makeMockBridge(opts?: Opts): WalletBridge<*> {
   const syncTimeouts = {}
 
   return {
-    synchronize(account: Account, { error, next, complete }) {
-      if (syncTimeouts[account.id]) {
+    synchronize(accountId: string, { error, next, complete }) {
+      if (syncTimeouts[accountId]) {
         // this is just for tests. we'll assume impl don't need to handle race condition on this function.
         console.warn('synchronize was called multiple pending time for same accounts!!!')
       }
-      syncTimeouts[account.id] = setTimeout(() => {
+      syncTimeouts[accountId] = setTimeout(() => {
         if (Math.random() < syncSuccessRate) {
-          account = { ...account }
-          const ops = broadcasted[account.id] || []
-          account.blockHeight++
-          for (const op of ops) {
-            account.balance += op.amount
-          }
-          broadcasted[account.id] = []
-          next(account)
+          const ops = broadcasted[accountId] || []
+          broadcasted[accountId] = []
+          next(account => {
+            account = { ...account }
+            account.blockHeight++
+            for (const op of ops) {
+              account.balance += op.amount
+            }
+            return account
+          })
           complete()
         } else {
           error(new Error('Sync Failed'))
         }
-        syncTimeouts[account.id] = null
+        syncTimeouts[accountId] = null
       }, 20000)
 
       return {
         unsubscribe() {
-          clearTimeout(syncTimeouts[account.id])
-          syncTimeouts[account.id] = null
+          clearTimeout(syncTimeouts[accountId])
+          syncTimeouts[accountId] = null
         },
       }
     },
@@ -96,11 +98,14 @@ function makeMockBridge(opts?: Opts): WalletBridge<*> {
       }
     },
 
-    pullMoreOperations: async account => {
-      if (transactionsSizeTarget >= account.operations.length) return account
-      const count = transactionsSizeTarget * (0.1 + 0.5 * Math.random())
+    pullMoreOperations: async (_accountId, _desiredCount) => {
       await delay(1000)
-      return genAddingOperationsInAccount(account, count, String(Math.random()))
+      return account => {
+        if (transactionsSizeTarget >= account.operations.length) return account
+        const count = transactionsSizeTarget * (0.1 + 0.5 * Math.random())
+        account = { ...account }
+        return genAddingOperationsInAccount(account, count, String(Math.random()))
+      }
     },
 
     createTransaction: () => ({

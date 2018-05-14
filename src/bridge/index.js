@@ -2,14 +2,14 @@
 import type { Currency } from '@ledgerhq/live-common/lib/types'
 import { WalletBridge } from './types'
 import UnsupportedBridge from './UnsupportedBridge'
+import LibcoreBridge from './LibcoreBridge'
 import makeMockBridge from './makeMockBridge'
 
-const EthereumJSImpl = makeMockBridge()
-const LibcoreImpl = UnsupportedBridge
-const RippleJSImpl = UnsupportedBridge
+const EthereumJSBridge = makeMockBridge()
+const RippleJSBridge = UnsupportedBridge
 
 export const getBridgeForCurrency = (currency: Currency): WalletBridge<any> => {
-  if (currency.id === 'ethereum') return EthereumJSImpl // polyfill js
-  if (currency.id === 'ripple') return RippleJSImpl // polyfill js
-  return LibcoreImpl // libcore for the rest
+  if (currency.id === 'ethereum') return EthereumJSBridge // polyfill js
+  if (currency.id === 'ripple') return RippleJSBridge // polyfill js
+  return LibcoreBridge // libcore for the rest
 }
