@@ -68,6 +68,8 @@ export interface WalletBridge<Transaction> {
 
   getTransactionRecipient(account: Account, transaction: Transaction): string;
 
+  isCompleteTransaction(account: Account, transaction: Transaction): boolean;
+
   // render the whole Fees section of the form
   EditFeeComponent?: React$ComponentType<{
     account: Account,

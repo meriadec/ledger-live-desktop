@@ -134,6 +134,8 @@ function makeMockBridge(opts?: Opts): WalletBridge<*> {
 
     EditAdvancedOptions,
 
+    isCompleteTransaction: (a, t) => (t.amount > 0 && t.recipient && true) || false,
+
     getTotalSpent: (a, t) => Promise.resolve(t.amount + t.feeCost),
 
     getMaxAmount: (a, t) => Promise.resolve(a.balance - t.feeCost),

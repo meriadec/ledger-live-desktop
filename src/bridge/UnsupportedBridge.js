@@ -24,6 +24,8 @@ const UnsupportedBridge: WalletBridge<*> = {
 
   getTransactionAmount: () => 0,
 
+  isCompleteTransaction: () => false,
+
   editTransactionRecipient: () => null,
 
   getTransactionRecipient: () => '',
