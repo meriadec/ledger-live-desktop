@@ -47,28 +47,30 @@ const handlers: Object = {
 
 // Selectors
 
-export const syncStateSelector = (state: State, { accountId }: { accountId: string }) =>
-  state.bridgeSync.syncs[accountId] || {
-    pending: false,
-    error: null,
-  }
+export const bridgeSyncSelector = (state: State) => state.bridgeSync
 
-export const pullMoreStateSelector = (state: State, { accountId }: { accountId: string }) =>
-  state.bridgeSync.pullMores[accountId] || {
-    pending: false,
-    error: null,
-  }
+const nothingState = { pending: false, error: null }
+
+export const syncStateLocalSelector = (
+  bridgeSync: BridgeSyncState,
+  { accountId }: { accountId: string },
+) => bridgeSync.syncs[accountId] || nothingState
+
+export const pullMoreStateLocalSelector = (
+  bridgeSync: BridgeSyncState,
+  { accountId }: { accountId: string },
+) => bridgeSync.pullMores[accountId] || nothingState
 
 export const globalSyncStateSelector = createSelector(
   getAccounts,
-  state => state,
-  (accounts, state) => {
+  bridgeSyncSelector,
+  (accounts, bridgeSync) => {
     const globalSyncState: AsyncState = {
       pending: false,
       error: null,
     }
     for (const account of accounts) {
-      const syncState = syncStateSelector(state, { accountId: account.id })
+      const syncState = syncStateLocalSelector(bridgeSync, { accountId: account.id })
       if (syncState.error) globalSyncState.error = syncState.error
       if (syncState.pending) globalSyncState.pending = true
     }

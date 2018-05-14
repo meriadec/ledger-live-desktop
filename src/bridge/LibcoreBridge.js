@@ -9,9 +9,11 @@ const notImplemented = new Error('LibcoreBridge: not implemented')
 // TODO for ipcRenderer listeners we should have a concept of requestId because
 // to be able to listen to events that only concerns you
 
+// IMPORTANT: please read ./types.js that specify & document everything
 const LibcoreBridge: WalletBridge<*> = {
-  synchronize(accountId, { next, complete, error }) {
+  synchronize(initialAccount, { next, complete, error }) {
     const unbind = () => ipcRenderer.removeListener('msg', handleAccountSync)
+
     function handleAccountSync(e, msg) {
       switch (msg.type) {
         case 'account.sync.progress': {
@@ -40,7 +42,7 @@ const LibcoreBridge: WalletBridge<*> = {
     return {
       unsubscribe() {
         unbind()
-        // maybe we need to also tell libcore we stop for now... (in practice we don't call this today)
+        console.warn('LibcoreBridge: interrupting synchronization is not supported')
       },
     }
   },
@@ -50,11 +52,7 @@ const LibcoreBridge: WalletBridge<*> = {
 
     function handleMsgEvent(e, { data, type }) {
       if (type === 'accounts.scanAccountsOnDevice.accountScanned') {
-        // create Account from AccountRaw account scanned on device
-        next({
-          ...decodeAccount(data),
-          archived: true,
-        })
+        next({ ...decodeAccount(data), archived: true })
       }
     }
 
@@ -88,7 +86,7 @@ const LibcoreBridge: WalletBridge<*> = {
       unsubscribe() {
         unsubscribed = true
         unbind()
-        // we need to tell libcore to stop scanning.. typically user have left the screen.
+        console.warn('LibcoreBridge: interrupting scanAccounts is not implemented') // FIXME
       },
     }
   },

@@ -35,7 +35,8 @@ function makeMockBridge(opts?: Opts): WalletBridge<*> {
   const syncTimeouts = {}
 
   return {
-    synchronize(accountId: string, { error, next, complete }) {
+    synchronize(initialAccount, { error, next, complete }) {
+      const accountId = initialAccount.id
       if (syncTimeouts[accountId]) {
         // this is just for tests. we'll assume impl don't need to handle race condition on this function.
         console.warn('synchronize was called multiple pending time for same accounts!!!')

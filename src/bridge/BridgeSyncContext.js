@@ -4,9 +4,13 @@ import { connect } from 'react-redux'
 import type { Account } from '@ledgerhq/live-common/lib/types'
 import { createStructuredSelector } from 'reselect'
 import { updateAccountWithUpdater } from 'actions/accounts'
-import type { State } from 'reducers'
 import { setAccountSyncState, setAccountPullMoreState } from 'actions/bridgeSync'
-import { pullMoreStateSelector, syncStateSelector } from 'reducers/bridgeSync'
+import {
+  bridgeSyncSelector,
+  syncStateLocalSelector,
+  pullMoreStateLocalSelector,
+} from 'reducers/bridgeSync'
+import type { BridgeSyncState } from 'reducers/bridgeSync'
 import { accountsSelector } from 'reducers/accounts'
 import { getBridgeForCurrency } from '.'
 
@@ -22,7 +26,7 @@ type BridgeSyncProviderProps = {
 }
 
 type BridgeSyncProviderOwnProps = BridgeSyncProviderProps & {
-  state: State,
+  bridgeSync: BridgeSyncState,
   accounts: Account[],
   updateAccountWithUpdater: (string, (Account) => Account) => void,
   setAccountSyncState: (string, AsyncState) => *,
@@ -46,7 +50,7 @@ type BridgeSync = {
 
 const mapStateToProps = createStructuredSelector({
   accounts: accountsSelector,
-  state: s => s,
+  bridgeSync: bridgeSyncSelector,
 })
 
 const actions = {
@@ -62,16 +66,19 @@ class Provider extends Component<BridgeSyncProviderOwnProps, BridgeSync> {
     const syncSubs = {}
     const pullMorePromises = {}
 
-    const getSyncState = accountId => syncStateSelector(this.props.state, { accountId })
+    const getSyncState = accountId => syncStateLocalSelector(this.props.bridgeSync, { accountId })
 
     const getPullMoreOperationsState = accountId =>
-      pullMoreStateSelector(this.props.state, { accountId })
+      pullMoreStateLocalSelector(this.props.bridgeSync, { accountId })
 
-    const getBridgeForAccountId = accountId => {
+    const getAccountById = accountId => {
       const a = this.props.accounts.find(a => a.id === accountId)
       if (!a) throw new Error('account not found')
-      return getBridgeForCurrency(a.currency)
+      return a
     }
+
+    const getBridgeForAccountId = accountId =>
+      getBridgeForCurrency(getAccountById(accountId).currency)
 
     const pullMoreOperations = (accountId, count) => {
       const state = getPullMoreOperationsState(accountId)
@@ -82,7 +89,7 @@ class Provider extends Component<BridgeSyncProviderOwnProps, BridgeSync> {
       }
       this.props.setAccountPullMoreState(accountId, { pending: true, error: null })
       const bridge = getBridgeForAccountId(accountId)
-      const p = bridge.pullMoreOperations(accountId, count).then(
+      const p = bridge.pullMoreOperations(getAccountById(accountId), count).then(
         accountUpdater => {
           this.props.setAccountPullMoreState(accountId, {
             pending: false,
@@ -110,7 +117,7 @@ class Provider extends Component<BridgeSyncProviderOwnProps, BridgeSync> {
       this.props.setAccountSyncState(accountId, { pending: true, error: null })
       const bridge = getBridgeForAccountId(accountId)
       const p = new Promise((resolve, reject) => {
-        const subscription = bridge.synchronize(accountId, {
+        const subscription = bridge.synchronize(getAccountById(accountId), {
           next: accountUpdater => {
             this.props.updateAccountWithUpdater(accountId, accountUpdater)
           },

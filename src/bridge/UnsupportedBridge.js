@@ -4,7 +4,7 @@ import type { WalletBridge } from './types'
 const genericError = new Error('UnsupportedBridge')
 
 const UnsupportedBridge: WalletBridge<*> = {
-  synchronize(accountId, { error }) {
+  synchronize(initialAccount, { error }) {
     Promise.resolve(genericError).then(error)
     return { unsubscribe() {} }
   },
