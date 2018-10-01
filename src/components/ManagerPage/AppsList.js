@@ -86,6 +86,7 @@ class AppsList extends PureComponent<Props, State> {
     appsLoaded: false,
     app: '',
     mode: 'home',
+    jobs: [],
   }
 
   componentDidMount() {
@@ -96,7 +97,70 @@ class AppsList extends PureComponent<Props, State> {
     this._unmounted = true
   }
 
+  queue = Promise.resolve()
+
   _unmounted = false
+
+  canRunJobForApp = appName =>
+    !this.state.jobs.some(
+      j => j.appName === appName && ['queued', 'running'].indexOf(j.status) !== -1,
+    )
+
+  treatJob = ({ type, app }) => {
+    const { jobs } = this.state
+    const jobId = `${type}-${app.name}-${jobs.length}`
+
+    const updateJob = job =>
+      this.setState(({ jobs }) => ({
+        jobs: jobs.map(j => (j.id === jobId ? { ...j, ...job } : j)),
+      }))
+
+    let isJobCancelled
+    const cancel = () => {
+      isJobCancelled = true
+      updateJob({ status: 'cancelled' })
+    }
+
+    const hide = () => updateJob({ status: 'hidden' })
+
+    const task = async () => {
+      if (this._unmounted || isJobCancelled) {
+        return
+      }
+
+      updateJob({ status: 'running' })
+
+      try {
+        const {
+          device: { path: devicePath },
+          deviceInfo,
+        } = this.props
+        const data = { app, devicePath, targetId: deviceInfo.targetId }
+        if (type === 'install') {
+          await installApp.send(data).toPromise()
+        } else if (type === 'uninstall') {
+          await uninstallApp.send(data).toPromise()
+        }
+
+        updateJob({ status: 'success' })
+      } catch (err) {
+        updateJob({ status: 'error', error: err })
+      }
+    }
+
+    const job = {
+      id: jobId,
+      appName: app.name,
+      status: 'queued',
+      cancel,
+      hide,
+      task,
+    }
+
+    this.queue = this.queue.then(job.task)
+
+    this.setState(({ jobs }) => ({ jobs: [...jobs, job] }))
+  }
 
   prepareAppList = ({ applicationsList, compatibleAppVersionsList, sortedCryptoCurrencies }) => {
     const filtered = this.props.isDevMode
@@ -158,35 +222,9 @@ class AppsList extends PureComponent<Props, State> {
     }
   }
 
-  handleInstallApp = (app: ApplicationVersion) => async () => {
-    this.setState({ status: 'busy', app: app.name, mode: 'installing' })
-    try {
-      const {
-        device: { path: devicePath },
-        deviceInfo,
-      } = this.props
-      const data = { app, devicePath, targetId: deviceInfo.targetId }
-      await installApp.send(data).toPromise()
-      this.setState({ status: 'success' })
-    } catch (err) {
-      this.setState({ status: 'error', error: err, mode: 'home' })
-    }
-  }
+  handleInstallApp = (app: ApplicationVersion) => () => this.treatJob({ type: 'install', app })
 
-  handleUninstallApp = (app: ApplicationVersion) => async () => {
-    this.setState({ status: 'busy', app: app.name, mode: 'uninstalling' })
-    try {
-      const {
-        device: { path: devicePath },
-        deviceInfo,
-      } = this.props
-      const data = { app, devicePath, targetId: deviceInfo.targetId }
-      await uninstallApp.send(data).toPromise()
-      this.setState({ status: 'success' })
-    } catch (err) {
-      this.setState({ status: 'error', error: err, app: '', mode: 'home' })
-    }
-  }
+  handleUninstallApp = (app: ApplicationVersion) => () => this.treatJob({ type: 'uninstall', app })
 
   handleCloseModal = () => this.setState({ status: 'idle', mode: 'home' })
 
@@ -310,6 +348,7 @@ class AppsList extends PureComponent<Props, State> {
                   icon={ICONS_FALLBACK[c.icon] || c.icon}
                   onInstall={canHandleInstall(c) ? this.handleInstallApp(c) : null}
                   onUninstall={this.handleUninstallApp(c)}
+                  isRunning={!this.canRunJobForApp(c.name)}
                 />
               ))}
             </List>
@@ -338,6 +377,7 @@ class AppsList extends PureComponent<Props, State> {
 
   render() {
     const { t } = this.props
+    const { jobs } = this.state
     return (
       <Box flow={6}>
         <Box>
@@ -356,6 +396,63 @@ class AppsList extends PureComponent<Props, State> {
             </Tooltip>
           </Box>
           {this.renderList()}
+          {jobs.filter(j => j.status !== 'hidden').length > 0 ? (
+            <div
+              style={{
+                position: 'fixed',
+                fontSize: 14,
+                bottom: 0,
+                right: 0,
+                width: 500,
+                background: 'white',
+                color: '#111',
+                cursor: 'default',
+                border: '3px solid lime',
+              }}
+            >
+              {jobs.map(
+                job =>
+                  job.status === 'hidden' ? null : (
+                    <div
+                      key={job.id}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        background: '#efefef',
+                        padding: 5,
+                        margin: 5,
+                      }}
+                    >
+                      {job.status === 'running' && <Spinner size={16} color="rgba(0, 0, 0, 0.5)" />}
+                      {job.id}
+                      <div
+                        style={{
+                          color:
+                            job.status === 'error'
+                              ? 'red'
+                              : job.status === 'success'
+                                ? 'green'
+                                : job.status === 'running'
+                                  ? 'blue'
+                                  : 'grey',
+                          fontWeight: 'bold',
+                          padding: 5,
+                        }}
+                      >
+                        {job.status}
+                        {job.status === 'error' ? <TranslatedError error={job.error} /> : null}
+                      </div>
+                      {job.status === 'queued' ? (
+                        <button onClick={job.cancel}>cancel</button>
+                      ) : null}
+                      {job.status !== 'running' && job.status !== 'queued' ? (
+                        <button onClick={job.hide}>hide</button>
+                      ) : null}
+                    </div>
+                  ),
+              )}
+            </div>
+          ) : null}
         </Box>
       </Box>
     )

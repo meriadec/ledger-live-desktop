@@ -51,9 +51,10 @@ type Props = {
   icon: string,
   onInstall?: Function,
   onUninstall: Function,
+  isRunning: boolean,
 }
 
-function ManagerApp({ name, version, icon, onInstall, onUninstall, t }: Props) {
+function ManagerApp({ name, version, icon, onInstall, onUninstall, isRunning, t }: Props) {
   const iconUrl = `https://api.ledgerwallet.com/update/assets/icons/${icon}`
   return (
     <Container>
@@ -64,10 +65,11 @@ function ManagerApp({ name, version, icon, onInstall, onUninstall, t }: Props) {
           {version}
         </Text>
       </Box>
-      {onInstall ? (
+      {onInstall && !isRunning ? (
         <Button
           outline
           onClick={onInstall}
+          disabled={isRunning}
           event={'Manager Install Click'}
           eventProperties={{
             appName: name,
@@ -80,6 +82,8 @@ function ManagerApp({ name, version, icon, onInstall, onUninstall, t }: Props) {
       <Button
         outline
         onClick={onUninstall}
+        disabled={isRunning}
+        isLoading={isRunning}
         event={'Manager Uninstall Click'}
         eventProperties={{
           appName: name,
