@@ -8,15 +8,15 @@ source scripts/helpers/run-job.sh
 # shellcheck disable=SC1091
 source scripts/helpers/display-env.sh
 
-if [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ]; then
-  echo "You are not on master. Exiting properly. (CI)"
-  exit 0
-fi
+# if [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ]; then
+#   echo "You are not on master. Exiting properly. (CI)"
+#   exit 0
+# fi
 
-if ! git describe --exact-match --tags 2>/dev/null >/dev/null; then
-  echo "You are not on a tag. Exiting properly. (CI)"
-  exit 0
-fi
+# if ! git describe --exact-match --tags 2>/dev/null >/dev/null; then
+#   echo "You are not on a tag. Exiting properly. (CI)"
+#   exit 0
+# fi
 
 if [ -z "$GH_TOKEN" ]; then
   echo "GH_TOKEN is unset. can't release" >&2
@@ -46,10 +46,10 @@ if [ ! -d "static/fonts/museosans" ]; then
     "error fetching museosans"
 fi
 
-if ! git diff-index --quiet HEAD --; then
-  echo "you have uncommitted local changes!" >&2
-  exit 1
-fi
+# if ! git diff-index --quiet HEAD --; then
+#   echo "you have uncommitted local changes!" >&2
+#   exit 1
+# fi
 
 # originRemote=$(git config --get remote.origin.url)
 # if [ "$originRemote" != "https://github.com/LedgerHQ/ledger-live-desktop.git" ]; then
