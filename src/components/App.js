@@ -9,6 +9,7 @@ import { I18nextProvider } from 'react-i18next'
 import { hot } from 'react-hot-loader'
 
 import theme from 'styles/theme'
+import GlobalStyle from 'styles/global'
 
 import i18n from 'renderer/i18n/electron'
 
@@ -32,6 +33,7 @@ const App = ({
         <I18nextProvider i18n={i18n} initialLanguage={language}>
           <ThemeProvider theme={theme}>
             <ThrowBlock>
+              <GlobalStyle />
               <ConnectedRouter history={history}>
                 <Switch>
                   <Route component={Default} />

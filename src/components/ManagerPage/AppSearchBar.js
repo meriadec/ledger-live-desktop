@@ -58,7 +58,7 @@ class AppSearchBar extends PureComponent<Props, State> {
     return (
       <Fragment>
         <Input
-          innerRef={c => (this.input = c)}
+          ref={c => (this.input = c)}
           type="text"
           value={query}
           onChange={this.handleChange}

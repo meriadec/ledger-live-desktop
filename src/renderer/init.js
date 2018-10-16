@@ -32,8 +32,6 @@ import sentry from 'sentry/browser'
 import App from 'components/App'
 import AppError from 'components/AppError'
 
-import 'styles/global'
-
 const rootNode = document.getElementById('app')
 const userDataDirectory = resolveUserDataDirectory()
 

@@ -2,7 +2,7 @@
 
 /* eslint-disable no-unused-expressions */
 
-import { injectGlobal } from 'styled-components'
+import { createGlobalStyle } from 'styled-components'
 import omitBy from 'lodash/omitBy'
 
 import { fontFace, rgba } from 'styles/helpers'
@@ -90,7 +90,7 @@ function transformFonts(allFonts) {
     .join('\n')
 }
 
-injectGlobal`
+const GlobalStyle = createGlobalStyle`
   ${transformFonts(fonts)};
   ${reset};
 
@@ -125,3 +125,5 @@ injectGlobal`
     background: ${rgba(colors.wallet, 0.1)};
   }
 `
+
+export default GlobalStyle

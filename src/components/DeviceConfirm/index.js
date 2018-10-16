@@ -1,7 +1,7 @@
 // @flow
 
 import React from 'react'
-import styled, { keyframes } from 'styled-components'
+import styled, { keyframes, css } from 'styled-components'
 
 import { rgba } from 'styles/helpers'
 
@@ -20,6 +20,10 @@ const pulseAnimation = p => keyframes`
   100% {
     box-shadow: 0 0 0 0 ${rgba(p.theme.colors.wallet, 0)};
   }
+`
+
+const pulseAnimationRule = p => css`
+  ${pulseAnimation(p)} 1s linear infinite;
 `
 
 const Wrapper = styled(Box).attrs({
@@ -56,7 +60,7 @@ const PushButton = styled(Box)`
   width: 1px;
 
   &:before {
-    animation: ${p => pulseAnimation(p)} 1s linear infinite;
+    animation: ${p => pulseAnimationRule(p)};
     background-color: ${p => p.theme.colors.wallet};
     border-radius: 50%;
     bottom: 0;

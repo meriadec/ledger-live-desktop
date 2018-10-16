@@ -184,7 +184,7 @@ export class Modal extends Component<Props> {
   _lastFocusedElement = null
 
   focusWrapper = () => {
-    // Forced to use findDOMNode here, because innerRef is giving a proxied component
+    // Forced to use findDOMNode here, because ref is giving a proxied component
     const domWrapper = findDOMNode(this._wrapper) // eslint-disable-line react/no-find-dom-node
 
     if (domWrapper instanceof HTMLDivElement) {
@@ -215,7 +215,7 @@ export class Modal extends Component<Props> {
                 tabIndex={-1}
                 op={m.opacity}
                 scale={m.scale}
-                innerRef={n => (this._wrapper = n)}
+                ref={n => (this._wrapper = n)}
                 onClick={stopPropagation}
                 width={width}
               >

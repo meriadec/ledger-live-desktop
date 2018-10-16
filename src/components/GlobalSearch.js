@@ -67,7 +67,7 @@ class GlobalSearch extends PureComponent<Props, State> {
             </Box>
             <Input
               placeholder={t('common.search')}
-              innerRef={input => (this._input = input)}
+              ref={input => (this._input = input)}
               onBlur={this.handleBlur}
               onFocus={this.handleFocus}
               isFocused={isFocused}

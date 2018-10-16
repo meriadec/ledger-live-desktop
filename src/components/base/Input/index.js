@@ -216,7 +216,7 @@ class Input extends PureComponent<Props, State> {
           <Base
             {...props}
             small={small}
-            innerRef={n => (this._input = n)}
+            ref={n => (this._input = n)}
             onFocus={this.handleFocus}
             onBlur={this.handleBlur}
             onChange={this.handleChange}
