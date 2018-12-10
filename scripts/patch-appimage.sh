@@ -4,7 +4,7 @@
 # distributions, due to loading system libraries
 # instead of embedded ones.
 #
-# see https://github.com/LedgerHQ/ledger-live-desktop/issues/1010
+# see https://github.com/meriadec/ledger-live-desktop/issues/1010
 
 set -e
 

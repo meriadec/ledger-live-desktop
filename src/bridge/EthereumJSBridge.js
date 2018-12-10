@@ -114,7 +114,7 @@ function isRecipientValid(currency, recipient) {
 
   // To handle non-eip55 addresses we stop validation here if we detect
   // address is either full upper or full lower.
-  // see https://github.com/LedgerHQ/ledger-live-desktop/issues/1397
+  // see https://github.com/meriadec/ledger-live-desktop/issues/1397
   const slice = recipient.substr(2)
   const isFullUpper = slice === slice.toUpperCase()
   const isFullLower = slice === slice.toLowerCase()

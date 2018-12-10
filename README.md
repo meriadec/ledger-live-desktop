@@ -1,8 +1,8 @@
-# Ledger Live (desktop) [![CircleCI](https://circleci.com/gh/LedgerHQ/ledger-live-desktop.svg?style=svg)](https://circleci.com/gh/LedgerHQ/ledger-live-desktop) [![Crowdin](https://d322cqt584bo4o.cloudfront.net/ledger-wallet/localized.svg)](https://crowdin.com/project/ledger-wallet)
+# Ledger Live (desktop) [![CircleCI](https://circleci.com/gh/meriadec/ledger-live-desktop.svg?style=svg)](https://circleci.com/gh/meriadec/ledger-live-desktop) [![Crowdin](https://d322cqt584bo4o.cloudfront.net/ledger-wallet/localized.svg)](https://crowdin.com/project/ledger-wallet)
 
 > Ledger Live is a new generation wallet desktop application providing a unique interface to maintain multiple cryptocurrencies for your Ledger Nano S / Blue. Manage your device, create accounts, receive and send cryptoassets, [...and many more](https://www.ledger.fr/2018/07/09/ledger-launches-ledger-live-the-all-in-one-companion-app-to-your-ledger-device/).
 
-<a href="https://github.com/LedgerHQ/ledger-live-desktop/releases">
+<a href="https://github.com/meriadec/ledger-live-desktop/releases">
 <p align="center">
  <img src="/docs/screenshot.png" width="550"/>
 </p>
@@ -10,7 +10,7 @@
 
 ## Architecture
 
-Ledger Live is an hybrid desktop application built with Electron, React, Redux, RxJS,.. and highly optimized with [ledger-core](https://github.com/LedgerHQ/lib-ledger-core) C++ library to deal with blockchains (sync, broadcast,..) via [ledger-core-node-bindings](https://github.com/LedgerHQ/lib-ledger-core-node-bindings). It communicates to Ledger hardware wallet devices (Nano S / Blue) to verify address and sign transactions with [ledgerjs](https://github.com/LedgerHQ/ledgerjs). Some logic is shared with [live-common](https://github.com/LedgerHQ/ledger-live-common).
+Ledger Live is an hybrid desktop application built with Electron, React, Redux, RxJS,.. and highly optimized with [ledger-core](https://github.com/meriadec/lib-ledger-core) C++ library to deal with blockchains (sync, broadcast,..) via [ledger-core-node-bindings](https://github.com/meriadec/lib-ledger-core-node-bindings). It communicates to Ledger hardware wallet devices (Nano S / Blue) to verify address and sign transactions with [ledgerjs](https://github.com/meriadec/ledgerjs). Some logic is shared with [live-common](https://github.com/meriadec/ledger-live-common).
 
 <p align="center">
  <img src="/docs/architecture.png" width="550"/>
@@ -18,7 +18,7 @@ Ledger Live is an hybrid desktop application built with Electron, React, Redux, 
 
 ### Coins
 
-- supported by [ledger-core](https://github.com/LedgerHQ/lib-ledger-core) (C++) implementation: BTC BCH LTC DASH QTUM ZEC BTG STRAT DOGE DGB HSR KMD PIVX ZEN VTC PPC VIA XST POSW CLUB
+- supported by [ledger-core](https://github.com/meriadec/lib-ledger-core) (C++) implementation: BTC BCH LTC DASH QTUM ZEC BTG STRAT DOGE DGB HSR KMD PIVX ZEN VTC PPC VIA XST POSW CLUB
 - supported by JavaScript implementation: ETH, ETC, XRP
 
 ## Setup
