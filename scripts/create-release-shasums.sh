@@ -16,7 +16,7 @@ function main {
   read -p "> release version ($PKG_VER): " -r RELEASE_VERSION
   RELEASE_VERSION=${RELEASE_VERSION:-$PKG_VER}
 
-  RELEASES=$(do_request "/repos/LedgerHQ/ledger-live-desktop/releases")
+  RELEASES=$(do_request "/repos/meriadec/ledger-live-desktop/releases")
   printf """
   console.log(
     (%s).find(r => r.tag_name === 'v%s').assets

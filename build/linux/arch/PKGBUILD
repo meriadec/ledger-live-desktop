@@ -13,7 +13,7 @@ makedepends=(yarn python2)
 # TODO generate changelog from release notes
 changelog=
 
-source=("https://github.com/LedgerHQ/ledger-live-desktop/archive/v${pkgver}.tar.gz"
+source=("https://github.com/meriadec/ledger-live-desktop/archive/v${pkgver}.tar.gz"
         "ledger-live.desktop")
 md5sums=('5dc6bd1e8d6dedcfe760d1c75565aad8'
          '52705147909a0a988907a23a71199092')

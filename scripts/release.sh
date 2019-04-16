@@ -54,7 +54,7 @@ if ! git diff-index --quiet HEAD --; then
 fi
 
 # originRemote=$(git config --get remote.origin.url)
-# if [ "$originRemote" != "https://github.com/LedgerHQ/ledger-live-desktop.git" ]; then
+# if [ "$originRemote" != "https://github.com/meriadec/ledger-live-desktop.git" ]; then
 #   echo "the origin remote is incorrect ($originRemote)"
 #   exit 1
 # fi
@@ -74,7 +74,7 @@ if [[ $(uname) == 'Linux' ]]; then
   # --------------------------------------------------------------------
   #                     Linux: Internal process error (null)
   #
-  # context: https://github.com/LedgerHQ/ledger-live-desktop/issues/1010
+  # context: https://github.com/meriadec/ledger-live-desktop/issues/1010
   # Linux: Internal process error (null)
   #
   # The "fix" is not optimal, as it doesn't really solve the problem
@@ -105,14 +105,14 @@ if [[ $(uname) == 'Linux' ]]; then
 
   scripts/upload-github-release-asset.sh \
     github_api_token="$GH_TOKEN" \
-    owner=LedgerHQ \
+    owner=meriadec \
     repo=ledger-live-desktop \
     tag="$GH_TAG" \
     filename="dist/ledger-live-desktop-$LEDGER_LIVE_VERSION-linux-x86_64.AppImage"
 
   scripts/upload-github-release-asset.sh \
     github_api_token="$GH_TOKEN" \
-    owner=LedgerHQ \
+    owner=meriadec \
     repo=ledger-live-desktop \
     tag="$GH_TAG" \
     filename="dist/latest-linux.yml"

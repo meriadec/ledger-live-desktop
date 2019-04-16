@@ -48,8 +48,8 @@ class ReleaseNotesBody extends PureComponent<Props, State> {
     try {
       const { data } = await network({
         method: 'GET',
-        url: 'https://api.github.com/repos/LedgerHQ/ledger-live-desktop/releases',
-        // `https://api.github.com/repos/LedgerHQ/ledger-live-desktop/releases/tags/v${version}`,
+        url: 'https://api.github.com/repos/meriadec/ledger-live-desktop/releases',
+        // `https://api.github.com/repos/meriadec/ledger-live-desktop/releases/tags/v${version}`,
       })
       const v = semver.parse(version)
       if (!v) throw new Error(`can't parse semver ${version}`)

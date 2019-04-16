@@ -5,7 +5,7 @@ export const urls = {
 
   // Social
   twitter: 'https://twitter.com/Ledger',
-  github: 'https://github.com/LedgerHQ/ledger-live-desktop',
+  github: 'https://github.com/meriadec/ledger-live-desktop',
   reddit: 'https://www.reddit.com/r/ledgerwallet/',
 
   // Campaigns
@@ -25,7 +25,7 @@ export const urls = {
   privacyPolicy: 'https://www.ledger.com/pages/privacy-policy',
 
   githubIssues:
-    'https://github.com/LedgerHQ/ledger-live-desktop/issues?q=is%3Aissue+is%3Aopen+label%3Abug+sort%3Acomments-desc',
+    'https://github.com/meriadec/ledger-live-desktop/issues?q=is%3Aissue+is%3Aopen+label%3Abug+sort%3Acomments-desc',
 
   // Exchanges
   coinhouse: 'https://www.coinhouse.com/r/157530?utm_source=legderlive&utm_medium=referral',
