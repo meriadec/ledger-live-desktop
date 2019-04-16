@@ -29,6 +29,9 @@ const cmd: Command<Input, Result> = createCommand('main:autoUpdate', () =>
         await appUpdater.verify()
         sendStatus('check-success')
       } catch (err) {
+        console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! we have an error in the secure update`)
+        console.log(err.message)
+        console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! UPDATE_CHECK_IGNORE ${UPDATE_CHECK_IGNORE}`)
         logger.critical(err)
         // don't throw if the check fail for now. it's a blank bullet.
         if (UPDATE_CHECK_IGNORE) {

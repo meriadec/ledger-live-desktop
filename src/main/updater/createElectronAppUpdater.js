@@ -14,9 +14,16 @@ import pubKey from './ledger-pubkey'
 export default async ({ feedURL, info }: { feedURL: string, info: Object }) => {
   const { version: updateVersion, path: filename, downloadedFile: filePath } = info
 
+  console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! feedUrl ${feedURL}`)
+  console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! info ${JSON.stringify(info)}`)
+
   const hashFileURL = `${feedURL}/ledger-live-desktop-${updateVersion}.sha512sum`
   const hashSigFileURL = `${feedURL}/ledger-live-desktop-${updateVersion}.sha512sum.sig`
   const keysURL = `${feedURL}/pubkeys`
+
+  console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! hashFileURL ${hashFileURL}`)
+  console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! hashSigFileURL ${hashSigFileURL}`)
+  console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! keysURL ${keysURL}`)
 
   return createAppUpdater({
     filename,
